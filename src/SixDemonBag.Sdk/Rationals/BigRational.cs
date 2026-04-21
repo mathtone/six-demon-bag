@@ -2,6 +2,12 @@
 
 namespace Six.Demon.Bag.Rationals;
 
+public interface IRational<T>
+	where T : INumber<T> {
+	T Numerator { get; }
+	T Denominator { get; }
+}
+
 public readonly struct BigRational :
 	IComparable,
 	IComparable<BigRational>,

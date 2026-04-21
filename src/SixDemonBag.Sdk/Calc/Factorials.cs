@@ -9,7 +9,7 @@ public static partial class Calculate {
 		if(n < factorials.Length) {
 			return factorials[n];
 		}
-		
+
 		var result = (BigInteger)factorials[^1];
 		for(var i = factorials.Length; i <= n; i++)
 			result *= i;

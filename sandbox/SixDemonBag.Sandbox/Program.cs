@@ -1,40 +1,32 @@
-﻿using Six.Demon.Bag.Calc;
-using Six.Demon.Bag.Rationals;
+﻿using System.Diagnostics;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+
 using Six.Demon.Bag.Sequences;
+var e = 2000000;
+//var fpg = new FastPrimeGenerator<int>();
 
+Console.WriteLine("ASYNC 1");
+var (time, result) = await AsyncTimedResult(async () => await FastPrimeGenerator<long>.GetPrimesAsync().ElementAtAsync(e));
+Console.WriteLine($"Prime #{e}: {result} (calculated cold with 1 threads in {time.TotalMilliseconds} ms)");
 
-//foreach(var i in Fibonacci.Sequence32) {
-	Console.WriteLine(Fibonacci.Sequence128.Count());
-//}
+for(var c = 4; c <= Environment.ProcessorCount; c+=4) {
+	//for(var i = 0; i < 6; i++) {
+		(time, result) = await AsyncTimedResult(async () => await FastPrimeGenerator<long>.GetPrimesAsync().ElementAtAsync(e));
+		Console.WriteLine($"Prime #{e}: {result} (calculated with {c} threads in {time.TotalMilliseconds} ms)");
+	//}
+}
 
-//foreach(var bn in GenerateBernoulliNumbers().Take(35)) {
-//	Console.WriteLine(bn);
-//}
+static (TimeSpan time, T result) TimedResult<T>(Func<T> func) {
+	var sw = Stopwatch.StartNew();
+	var result = func();
+	sw.Stop();
+	return (sw.Elapsed, result);
+}
 
-//static IEnumerable<BigRational> GenerateBernoulliNumbers() {
-//	var cache = new List<BigRational> {
-//		BigRational.One,
-//		new(-1, 2)
-//	};
-
-//	foreach(var b in cache)
-//		yield return b;
-
-//	for(int n = 2; ; n++) {
-//		if((n & 1) == 1) {
-//			cache.Add(BigRational.Zero);
-//			yield return BigRational.Zero;
-//			continue;
-//		}
-
-//		var sum = BigRational.Zero;
-
-//		for(int k = 0; k < n; k++) {
-//			sum += Calculate.BinomialCoefficient(n + 1, k) * cache[k];
-//		}
-
-//		var bn = -sum / (n + 1);
-//		cache.Add(bn);
-//		yield return bn;
-//	}
-//}
+static async Task<(TimeSpan time, T result)> AsyncTimedResult<T>(Func<Task<T>> func) {
+	var sw = Stopwatch.StartNew();
+	var result = await func();
+	sw.Stop();
+	return (sw.Elapsed, result);
+}

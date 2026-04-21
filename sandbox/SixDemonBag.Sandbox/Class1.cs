@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Text;
+
 using Math = System.Math;
 namespace Six.Demon.Bag.Sandbox;
 
@@ -189,4 +190,3 @@ public static partial class PiBinary {
 		}
 	}
 }
-

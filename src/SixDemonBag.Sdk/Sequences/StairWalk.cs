@@ -1,30 +1,37 @@
-﻿
-using System.Numerics;
+﻿using System.Numerics;
+
 namespace Six.Demon.Bag.Sequences;
-public static class StairWalk {
-	public static IEnumerable<BigInteger> FibonacciSequence => Walk(2);
 
-	public static BigInteger GetWalksToTop(int height, int maxSteps) =>
-		Walk(maxSteps).ElementAt(height + 1);
+public static class StairWalk<T>
+	where T : INumber<T> {
+	public static IEnumerable<T> GetSequence(int maxJump) {
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxJump);
 
-	public static IEnumerable<BigInteger> Walk(int maxSteps) {
+		var head = 0;
+		var rollingSum = T.One;
+		var window = new T[maxJump];
 
-		var r = new BigInteger[maxSteps + 1];
-		yield return r[0] = 0;
-		yield return r[1] = 1;
-
-		for(var i = 2; i < maxSteps; i++) {
-			r[i] = r[0..i].Sum();
-			yield return r[i];
-		}
+		window[0] = T.One;
 
 		while(true) {
-			r[maxSteps] = 0;
-			for(var i = 0U; i < maxSteps; i++) {
-				r[maxSteps] += r[i];
-				r[i] = r[i + 1];
+			yield return rollingSum;
+
+			var outgoing = window[head];
+			window[head] = rollingSum;
+			head = (head + 1) % maxJump;
+
+			try {
+				rollingSum = checked(rollingSum + (rollingSum - outgoing));
 			}
-			yield return r[maxSteps];
+			catch(OverflowException) {
+				yield break;
+			}
 		}
+	}
+
+	public static T CountWays(int stairs, int maxJump) {
+		ArgumentOutOfRangeException.ThrowIfNegative(stairs);
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxJump);
+		return GetSequence(maxJump).ElementAt(stairs);
 	}
 }

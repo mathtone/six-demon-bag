@@ -12,6 +12,6 @@ public class BinomialCoefficientTests {
 	[InlineData(5, 4, 5)]
 	[InlineData(52, 2, 1326)]
 	[InlineData(52, 5, 2598960)]
-	public void TestBinomialCoefficient(int n, int k, BigInteger expected) =>
+	public async Task TestBinomialCoefficient(int n, int k, BigInteger expected) =>
 		Assert.Equal(expected, Calculate.BinomialCoefficient(n, k));
 }

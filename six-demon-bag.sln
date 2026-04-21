@@ -10,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SixDemonBag.Tests", "tests\SixDemonBag.Tests\SixDemonBag.Tests.csproj", "{F95857D6-CF59-4221-A32F-9DFEB9BCE18F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6D8D2DF5-1241-4D80-A07B-BC2AEEFFBC81}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SixDemonBag.Sandbox", "sandbox\SixDemonBag.Sandbox\SixDemonBag.Sandbox.csproj", "{E812378B-6AE9-4F27-9096-103D09E16163}"
 EndProject

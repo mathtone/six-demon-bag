@@ -7,7 +7,8 @@ namespace Six.Demon.Bag.Sequences;
 
 public static class BernoulliNumbers {
 
-	public static IEnumerable<BigRational> Sequence => GenerateBernoulliNumbers();
+	public static IEnumerable<BigRational> Sequence =>
+		GenerateBernoulliNumbers();
 
 	private static IEnumerable<BigRational> GenerateBernoulliNumbers() {
 
@@ -22,7 +23,7 @@ public static class BernoulliNumbers {
 		for(int n = 2; true; n++) {
 			if(n % 2 != 0) {
 				cache.Add(new(0));
-				yield return cache.Last();
+				yield return cache[^1];
 				continue;
 			}
 

@@ -8,9 +8,6 @@ public class Permutations {
 	public static IEnumerable<T[]> GetAllPermutations<T>(params T[] items) =>
 		GetAllPermutations(items, 0);
 
-	//public static IEnumerable<T[]> GetAllPermutations<T>(IEnumerable<T> input) =>
-	//	GetAllPermutations(input, 0);
-
 	protected static IEnumerable<T[]> GetAllPermutations<T>(IEnumerable<T> input, int start = 0) {
 
 		var s = start + 1;
@@ -33,10 +30,7 @@ public class Permutations {
 		}
 	}
 
-	public static IEnumerable<T[]> GetAllSubsets<T>(IEnumerable<T> items, int choose) =>
-		GetAllSubsets(items.ToList(), choose, 0);
-
-	public static IEnumerable<T[]> GetAllSubsets<T>(List<T> items, int choose, int startIndex) {
+	public static IEnumerable<T[]> GetAllSubsets<T>(List<T> items, int choose, int startIndex=0) {
 		if(choose == 0) {
 			yield return [];
 		}
@@ -57,21 +51,10 @@ public static class CollectionExtensions {
 		items[b] = t;
 	}
 
-	public static void Shuffle<T>(this IList<T> items) {
-		var rng = new Random();
-		for(var i = items.Count; i > 1; i--) {
-			items.Swap(rng.Next(i), i - 1);
-		}
-	}
-
-	//	public static IEnumerable<T> Shuffled<T>(this IList<T> items) {
-	//		var rng = new Random();
-	//		var indices = Enumerable.Range(0, items.Count).ToArray();
-	//		//indices.UnSort();
-	//		//return indices.Select(i => items[i]);
-	//		for(var i = items.Count; i > 1; i--) {
-	//			indices.Swap(rng.Next(i), i - 1);
-	//			yield return items[indices[i - 1]];
-	//		}
+	//public static void Shuffle<T>(this IList<T> items) {
+	//	var rng = new Random();
+	//	for(var i = items.Count; i > 1; i--) {
+	//		items.Swap(rng.Next(i), i - 1);
 	//	}
+	//}
 }

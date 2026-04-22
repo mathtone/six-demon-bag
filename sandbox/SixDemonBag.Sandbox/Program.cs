@@ -2,31 +2,49 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
+using Six.Demon.Bag.Primes;
 using Six.Demon.Bag.Sequences;
-var e = 2000000;
-//var fpg = new FastPrimeGenerator<int>();
+using Six.Demon.Bag.Utilities;
 
-Console.WriteLine("ASYNC 1");
-var (time, result) = await AsyncTimedResult(async () => await FastPrimeGenerator<long>.GetPrimesAsync().ElementAtAsync(e));
-Console.WriteLine($"Prime #{e}: {result} (calculated cold with 1 threads in {time.TotalMilliseconds} ms)");
 
-for(var c = 4; c <= Environment.ProcessorCount; c+=4) {
-	//for(var i = 0; i < 6; i++) {
-		(time, result) = await AsyncTimedResult(async () => await FastPrimeGenerator<long>.GetPrimesAsync().ElementAtAsync(e));
-		Console.WriteLine($"Prime #{e}: {result} (calculated with {c} threads in {time.TotalMilliseconds} ms)");
-	//}
-}
+//var c = Primes<short>.GetPrimes().Last();
+var n = BernoulliNumbers<int>.Sequence.Take(20).ToArray();
+Console.WriteLine(string.Join(',',n));
 
-static (TimeSpan time, T result) TimedResult<T>(Func<T> func) {
-	var sw = Stopwatch.StartNew();
-	var result = func();
-	sw.Stop();
-	return (sw.Elapsed, result);
-}
+//public static class Primes<T> where T: INumber<T> {
 
-static async Task<(TimeSpan time, T result)> AsyncTimedResult<T>(Func<Task<T>> func) {
-	var sw = Stopwatch.StartNew();
-	var result = await func();
-	sw.Stop();
-	return (sw.Elapsed, result);
-}
+//	static readonly T One = T.One;
+//	static readonly T Two = T.CreateChecked(2);
+
+//	public static IEnumerable<T> GetPrimes() {
+
+//		var primes = new List<T> { Two };
+//		T current = One;
+
+//		while(true) {
+//			try {
+//				current = checked(current + Two);
+//			}
+//			catch(OverflowException) {
+//				yield break;
+//			}
+
+//			var isComposite = false;
+
+//			foreach(var p in primes) {
+//				if(p > current / p)
+//					break;
+
+//				if(current % p == T.Zero) {
+//					isComposite = true;
+//					break;
+//				}
+//			}
+
+//			if(!isComposite) {
+//				primes.Add(current);
+//				yield return current;
+//			}
+//		}
+//	}
+//}

@@ -1,6 +1,6 @@
-﻿using Six.Demon.Bag.Sequences;
+﻿using Six.Demon.Bag.Primes;
 
-namespace Six.Demon.Bag.Tests.Sequences;
+namespace Six.Demon.Bag.Tests.Primes;
 
 public class PrimesTests {
 

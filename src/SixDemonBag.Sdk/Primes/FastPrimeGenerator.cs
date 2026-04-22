@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace Six.Demon.Bag.Sequences;
+namespace Six.Demon.Bag.Primes;
 
 public static class FastPrimeGenerator<T>
 	where T : IBinaryInteger<T> {

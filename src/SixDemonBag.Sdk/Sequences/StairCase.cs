@@ -2,7 +2,7 @@
 
 namespace Six.Demon.Bag.Sequences;
 
-public static class StairWalk<T>
+public static class StairCase<T>
 	where T : INumber<T> {
 	public static IEnumerable<T> GetSequence(int maxJump) {
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxJump);
@@ -31,7 +31,7 @@ public static class StairWalk<T>
 
 	public static T CountWays(int stairs, int maxJump) {
 		ArgumentOutOfRangeException.ThrowIfNegative(stairs);
-		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxJump);
+		//ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxJump);
 		return GetSequence(maxJump).ElementAt(stairs);
 	}
 }

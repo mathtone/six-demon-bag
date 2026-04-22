@@ -27,7 +27,7 @@ public static class Fibonacci {
 	public static IEnumerable<T> Get<T>() where T : INumber<T> {
 		yield return T.Zero;
 
-		foreach(var n in StairWalk<T>.GetSequence(2))
+		foreach(var n in StairCase<T>.GetSequence(2))
 			yield return n;
 	}
 }

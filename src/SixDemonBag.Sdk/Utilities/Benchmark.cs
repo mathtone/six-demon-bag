@@ -3,6 +3,23 @@
 namespace Six.Demon.Bag.Utilities;
 
 public static class Benchmark {
+
+	public static TimeSpan TimedRun<T>(Action func) {
+		var sw = Stopwatch.StartNew();
+		sw.Restart();
+		func();
+		sw.Stop();
+		return (sw.Elapsed);
+	}
+
+	public static async Task<TimeSpan> AsyncTimedRun<T>(Func<Task> func) {
+		var sw = Stopwatch.StartNew();
+		sw.Restart();
+		await func();
+		sw.Stop();
+		return (sw.Elapsed);
+	}
+
 	public static (TimeSpan Time, T Result) TimedResult<T>(Func<T> func) {
 		var sw = Stopwatch.StartNew();
 		sw.Restart();

@@ -1,18 +1,62 @@
 ﻿using System.Collections;
 
+using Six.Demon.Bag.Calc;
 using Six.Demon.Bag.Lists;
 using Six.Demon.Bag.Primes;
 using Six.Demon.Bag.Utilities;
 
-var l = new List<long>();
-;
-for(var n = 0; n < Array.MaxLength;n++) {
-	l.Add(n);
+
+var value = new string([.. Enumerable.Range(0, 100000).Select(i => 'a')]) + "X";
+var vchar = value.ToCharArray();
+var runs = 10;
+var r1 = Benchmark.TimedResult(() => Calculate.ShortestPalindrome(value));
+var r2 = Benchmark.TimedResult(() => Calculate.ShortestPalindromeFast(value));
+
+static string Repeat(string s, int n) => string.Concat(Enumerable.Repeat(s, n));
+
+var tests = new[] {
+	Repeat("a", 1000000) + "X",
+	Repeat("ab", 1000000) + "X",
+	Repeat("aaab", 1000000) + "X",
+	Repeat("abcd", 1000000) + "X",
+};
+
+foreach(var test in tests) {
+	r1 = Benchmark.TimedResult(() => Calculate.ShortestPalindrome(test));
+	Console.WriteLine($"r1: {r1.Time.TotalMilliseconds}ms");
+
+	r2 = Benchmark.TimedResult(() => Calculate.ShortestPalindromeFast(test));
+	Console.WriteLine($"r2: {r2.Time.TotalMilliseconds}ms");
 }
-l.Add(1);
-var x = 100;
-var i = x/int.MaxValue;
-;
+
+foreach(var test in tests) {
+	r1 = Benchmark.TimedResult(() => Calculate.ShortestPalindrome(test));
+	Console.WriteLine($"r1: {r1.Time.TotalMilliseconds}ms");
+
+	r2 = Benchmark.TimedResult(() => Calculate.ShortestPalindromeFast(test));
+	Console.WriteLine($"r2: {r2.Time.TotalMilliseconds}ms");
+}
+
+
+//for(var i = 0; i < runs; i++) {
+//	r1 = Benchmark.TimedResult(() => Calculate.ShortestPalindrome(vchar));
+//	Console.WriteLine($"r1: {r1.Time.TotalMilliseconds}ms");
+//}
+//Console.WriteLine();
+//for(var i = 0; i < runs; i++) {
+//	r2 = Benchmark.TimedResult(() => Calculate.ShortestPalindromeFast(vchar));
+//	Console.WriteLine($"r2: {r2.Time.TotalMilliseconds}ms");
+//}
+
+//var l = new List<long>();
+//;
+//for(var n = 0; n < Array.MaxLength;n++) {
+//	l.Add(n);
+//}
+//l.Add(1);
+//var x = 100;
+//var i = x/int.MaxValue;
+//;
 
 //var x = 5000000;
 //Run("PG1 (Warmup)", () => PrimeGenerator<long>.GetPrimes().ElementAt(x));

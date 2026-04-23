@@ -11,7 +11,7 @@ public static partial class Calculate {
 		if(k == T.Zero || k == n)
 			return T.One;
 
-		var two = T.CreateChecked(2);
+		var two = T.One + T.One;
 		if(k > n / two)
 			k = n - k;
 
@@ -21,19 +21,18 @@ public static partial class Calculate {
 			var numerator = n - k + i;
 			var denominator = i;
 
-			var gcd1 = Gcd(numerator, denominator);
-			numerator /= gcd1;
-			denominator /= gcd1;
+			var gcd = Gcd(numerator, denominator);
+			numerator /= gcd;
+			denominator /= gcd;
 
-			var gcd2 = Gcd(result, denominator);
-			result /= gcd2;
-			denominator /= gcd2;
+			gcd = Gcd(result, denominator);
+			result /= gcd;
+			denominator /= gcd;
+
+			if(denominator != T.One)
+				throw new InvalidOperationException("Internal reduction failure.");
 
 			result = checked(result * numerator);
-
-			// denominator should now be 1 for exact integer arithmetic
-			if(denominator != T.One)
-				throw new InvalidOperationException("Binomial coefficient reduction did not fully eliminate the denominator.");
 		}
 
 		return result;

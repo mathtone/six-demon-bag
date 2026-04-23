@@ -3,31 +3,35 @@
 namespace Six.Demon.Bag.Calc;
 
 public static partial class Calculate {
+	private const int MaxFactorial32 = 12;
+	private const int MaxFactorial64 = 20;
+	private const int MaxFactorial128 = 33;
 
 	public static BigInteger Factorial(int n) {
 		n = ThrowIfNegative(n);
-		if(n < factorials.Length) {
-			return factorials[n];
-		}
 
-		var result = (BigInteger)factorials[^1];
+		if(n < factorials.Length)
+			return factorials[n];
+
+		BigInteger result = factorials[^1];
 		for(var i = factorials.Length; i <= n; i++)
 			result *= i;
+
 		return result;
 	}
 
 	public static int Factorial32(int n) =>
-		ThrowIfNegative(n) > 12
+		ThrowIfNegative(n) > MaxFactorial32
 			? throw new ArgumentOutOfRangeException(nameof(n), "Factorials greater than 12 do not fit in an int.")
 			: (int)factorials[n];
 
 	public static long Factorial64(int n) =>
-		ThrowIfNegative(n) > 20
+		ThrowIfNegative(n) > MaxFactorial64
 			? throw new ArgumentOutOfRangeException(nameof(n), "Factorials greater than 20 do not fit in a long.")
 			: (long)factorials[n];
 
 	public static Int128 Factorial128(int n) =>
-		ThrowIfNegative(n) > 33
+		ThrowIfNegative(n) > MaxFactorial128
 			? throw new ArgumentOutOfRangeException(nameof(n), "Factorials greater than 33 do not fit in an Int128.")
 			: factorials[n];
 

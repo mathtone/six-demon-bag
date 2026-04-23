@@ -3,37 +3,30 @@
 namespace Six.Demon.Bag.Lists;
 
 public class LargeList<T> : ILargeList<T> {
-
 	private const int ChunkBits = 20;
 	private const int ChunkSize = 1 << ChunkBits;
 	private const int ChunkMask = ChunkSize - 1;
+
 	private readonly List<T[]> chunks = [];
 	private long count;
 
 	public long Count => count;
 
-	int ICollection<T>.Count { get; }
-	bool ICollection<T>.IsReadOnly { get; }
-
-	T IList<T>.this[int index] {
-		get => this[index];
-		set => this[index] = value;
-	}
-
 	public T this[long index] {
 		get {
-			ValidateIndex(index);
+			index = ValidateIndex(index);
 			return GetChunk(index)[GetOffset(index)];
 		}
 		set {
-			ValidateIndex(index);
+			index = ValidateIndex(index);
 			GetChunk(index)[GetOffset(index)] = value;
 		}
 	}
 
 	public void Add(T item) {
 		EnsureCapacityFor(count);
-		this[count++] = item;
+		GetChunk(count)[GetOffset(count)] = item;
+		count++;
 	}
 
 	public void Clear() {
@@ -41,15 +34,24 @@ public class LargeList<T> : ILargeList<T> {
 		count = 0;
 	}
 
-	public bool Contains(T item) =>
-		IndexOf(item) >= 0;
+	public bool Contains(T item) => IndexOf(item) >= 0;
 
 	public long IndexOf(T item) {
 		var comparer = EqualityComparer<T>.Default;
+		var remaining = count;
+		var baseIndex = 0L;
 
-		for(var i = 0L; i < count; i++) {
-			if(comparer.Equals(this[i], item))
-				return i;
+		for(var chunkIndex = 0; chunkIndex < chunks.Count && remaining > 0; chunkIndex++) {
+			var chunk = chunks[chunkIndex];
+			var length = remaining > ChunkSize ? ChunkSize : (int)remaining;
+
+			for(var i = 0; i < length; i++) {
+				if(comparer.Equals(chunk[i], item))
+					return baseIndex + i;
+			}
+
+			baseIndex += length;
+			remaining -= length;
 		}
 
 		return -1;
@@ -59,8 +61,11 @@ public class LargeList<T> : ILargeList<T> {
 		if(index < 0 || index > count)
 			throw new ArgumentOutOfRangeException(nameof(index));
 
-		// Slow, but correct. Insert in a giant logical array
-		// necessarily means shifting.
+		if(index == count) {
+			Add(item);
+			return;
+		}
+
 		Add(default!);
 
 		for(var i = count - 1; i > index; i--)
@@ -79,49 +84,51 @@ public class LargeList<T> : ILargeList<T> {
 	}
 
 	public void RemoveAt(long index) {
-		ValidateIndex(index);
+		index = ValidateIndex(index);
 
 		for(var i = index; i < count - 1; i++)
 			this[i] = this[i + 1];
 
 		count--;
-
-		// Clear released slot so references can be GC'd
-		this[count] = default!;
+		GetChunk(count)[GetOffset(count)] = default!;
 	}
 
+
+
 	public IEnumerator<T> GetEnumerator() {
-		for(var i = 0L; i < count; i++)
-			yield return this[i];
+		var remaining = count;
+
+		for(var chunkIndex = 0; chunkIndex < chunks.Count && remaining > 0; chunkIndex++) {
+			var chunk = chunks[chunkIndex];
+			var length = remaining > ChunkSize ? ChunkSize : (int)remaining;
+
+			for(var i = 0; i < length; i++)
+				yield return chunk[i];
+
+			remaining -= length;
+		}
 	}
 
 	private void EnsureCapacityFor(long index) {
+		ArgumentOutOfRangeException.ThrowIfNegative(index);
+
 		var requiredChunk = index >> ChunkBits;
 
 		while(chunks.Count <= requiredChunk)
 			chunks.Add(new T[ChunkSize]);
 	}
 
-	private T[] GetChunk(long index) =>
-		chunks[checked((int)(index >> ChunkBits))];
+	private T[] GetChunk(long index) => chunks[checked((int)(index >> ChunkBits))];
 
 	private static int GetOffset(long index) =>
 		(int)(index & ChunkMask);
 
-	private void ValidateIndex(long index) {
+	private long ValidateIndex(long index) {
 		if(index < 0 || index >= count)
 			throw new ArgumentOutOfRangeException(nameof(index));
-	}
 
-	int IList<T>.IndexOf(T item) {
-		var index = this.IndexOf(item);
-		return index > int.MaxValue ?
-			throw new InvalidOperationException("Index exceeds int.MaxValue.") :
-			(int)index;
+		return index;
 	}
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-	void IList<T>.Insert(int index, T item) => this.Insert(index, item);
-	void IList<T>.RemoveAt(int index) => this.RemoveAt(index);
-	void ICollection<T>.CopyTo(T[] array, int arrayIndex) => throw new NotImplementedException();
 }

@@ -7,6 +7,8 @@ public static class FastPrimeGenerator<T>
 	where T : IBinaryInteger<T> {
 
 	private static readonly T Two = T.CreateChecked(2);
+	private static readonly T Three = T.CreateChecked(3);
+
 	private static readonly T[] SeedPrimes = [.. PrimeGenerator<T>.GetPrimes().Take(64)];
 
 	public static async IAsyncEnumerable<T> GetPrimesAsync(
@@ -14,26 +16,32 @@ public static class FastPrimeGenerator<T>
 		int? degreeOfParallelism = null,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default
 	) {
+		ArgumentOutOfRangeException.ThrowIfLessThan(segmentOddCount, 1);
 
 		var dop = degreeOfParallelism ?? Environment.ProcessorCount;
-		var knownPrimes = new List<T>(SeedPrimes);
-
-		ArgumentOutOfRangeException.ThrowIfLessThan(segmentOddCount, 1);
 		ArgumentOutOfRangeException.ThrowIfLessThan(dop, 1);
 
-		foreach(var prime in knownPrimes)
+		// Yield 2 separately. Keep only odd primes in the working list so
+		// segment scans do not waste time checking candidate % 2.
+		yield return Two;
+
+		var knownPrimes = new List<T>(SeedPrimes.Length - 1);
+		for(var i = 1; i < SeedPrimes.Length; i++) {
+			var prime = SeedPrimes[i];
+			knownPrimes.Add(prime);
 			yield return prime;
+		}
 
 		var nextCandidate = checked(knownPrimes[^1] + Two);
 
 		while(true) {
-
 			cancellationToken.ThrowIfCancellationRequested();
+
 			var last = knownPrimes[^1];
 			if(!TryCheckedMultiply(last, last, out var safeEnd))
 				yield break;
 
-			nextCandidate = EnsureOddAtOrBelow(nextCandidate);
+			nextCandidate = EnsureOddAtOrAbove(nextCandidate);
 
 			if(nextCandidate > safeEnd)
 				yield break;
@@ -49,7 +57,9 @@ public static class FastPrimeGenerator<T>
 			var waveEnd = EnsureOddAtOrBelow(Min(candidateEnd, safeEnd));
 
 			if(nextCandidate > waveEnd) {
-				nextCandidate = checked(waveEnd + Two);
+				if(!TryCheckedAdd(waveEnd, Two, out nextCandidate))
+					yield break;
+
 				continue;
 			}
 
@@ -74,17 +84,19 @@ public static class FastPrimeGenerator<T>
 				}
 			}
 
-			nextCandidate = checked(waveEnd + Two);
+			if(!TryCheckedAdd(waveEnd, Two, out nextCandidate))
+				yield break;
+
 			await Task.Yield();
 		}
 	}
 
 	private static List<Segment> BuildSegments(T start, T end, int segmentOddCount) {
-		
 		var segments = new List<Segment>();
-		var segmentWidth = T.CreateChecked(segmentOddCount) * Two - T.One;
+		var segmentWidth = checked(T.CreateChecked(segmentOddCount) * Two - T.One);
+
 		var index = 0;
-		var segmentStart = start;
+		var segmentStart = EnsureOddAtOrAbove(start);
 
 		while(segmentStart <= end) {
 			var segmentEnd = TryCheckedAdd(segmentStart, segmentWidth, out var candidateEnd)
@@ -92,24 +104,32 @@ public static class FastPrimeGenerator<T>
 				: end;
 
 			segmentEnd = EnsureOddAtOrBelow(segmentEnd);
-
 			segments.Add(new Segment(index++, segmentStart, segmentEnd));
-			segmentStart = segmentEnd + Two;
+
+			if(!TryCheckedAdd(segmentEnd, Two, out segmentStart))
+				break;
 		}
 
 		return segments;
 	}
 
-	private static SegmentResult FindPrimesInSegment(int index, T start, T end, IReadOnlyList<T> knownPrimes, CancellationToken cancellationToken) {
-
+	private static SegmentResult FindPrimesInSegment(
+		int index,
+		T start,
+		T end,
+		IReadOnlyList<T> knownPrimes,
+		CancellationToken cancellationToken
+	) {
 		var primes = new List<T>();
 
-		for(var candidate = start; candidate <= end; candidate += Two) {
+		for(var candidate = EnsureOddAtOrAbove(start); candidate <= end; candidate += Two) {
 			cancellationToken.ThrowIfCancellationRequested();
 
 			var isComposite = false;
 
-			foreach(var prime in knownPrimes) {
+			for(var i = 0; i < knownPrimes.Count; i++) {
+				var prime = knownPrimes[i];
+
 				if(prime > candidate / prime)
 					break;
 
@@ -133,6 +153,7 @@ public static class FastPrimeGenerator<T>
 				T.CreateChecked(degreeOfParallelism) *
 				Two -
 				T.One);
+
 			return true;
 		}
 		catch(OverflowException) {
@@ -162,6 +183,9 @@ public static class FastPrimeGenerator<T>
 			return false;
 		}
 	}
+
+	private static T EnsureOddAtOrAbove(T value) =>
+		(value & T.One) == T.Zero ? checked(value + T.One) : value;
 
 	private static T EnsureOddAtOrBelow(T value) =>
 		(value & T.One) == T.Zero ? value - T.One : value;

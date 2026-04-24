@@ -6,14 +6,15 @@ public static partial class Calculate {
 		ArgumentNullException.ThrowIfNull(input);
 		return new string(ShortestPalindrome(input.ToCharArray()));
 	}
+	public static T[] ShortestPalindrome<T>(T[] input) =>
+		ShortestPalindrome(input, EqualityComparer<T>.Default);
 
-	public static T[] ShortestPalindrome<T>(T[] input) {
+	public static T[] ShortestPalindrome<T>(T[] input, IEqualityComparer<T> comparer) {
 		ArgumentNullException.ThrowIfNull(input);
-		
+
 		if(input.Length <= 1)
 			return input;
 
-		var comparer = EqualityComparer<T>.Default;
 		var i = 0;
 		var j = input.Length - 1;
 

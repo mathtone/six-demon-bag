@@ -47,11 +47,11 @@ public static class Fibonacci {
 		return b;
 	}
 
-#if DEBUG
+#if TEST
 	// Never use this in production. Demonstration/testing only.
-	public static int RecursiveCalc(int n) =>
+	public static int GetNthNumberRecurse(int n) =>
 		(n < 2)
 			? n
-			: checked(RecursiveCalc(n - 1) + RecursiveCalc(n - 2));
+			: checked(GetNthNumberRecurse(n - 1) + GetNthNumberRecurse(n - 2));
 #endif
 }

@@ -29,6 +29,30 @@ public static class StairCase<T>
 		}
 	}
 
+	public static T[] GetResultSet(int stairs, int maxJump) {
+		ArgumentOutOfRangeException.ThrowIfNegative(stairs);
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxJump);
+		var result = new T[stairs];
+		var head = 0;
+		var rollingSum = T.One;
+		var window = new T[maxJump];
+		window[0] = T.One;
+		for(var i = 0; i < stairs; i++) {
+			result[i] = rollingSum;
+			var incoming = rollingSum;
+			var outgoing = window[head];
+			window[head] = incoming;
+			head = (head + 1) % maxJump;
+			try {
+				rollingSum = checked(rollingSum + incoming - outgoing);
+			}
+			catch(OverflowException) {
+				throw;
+			}
+		}
+		return result;
+	}
+
 	public static T CountWays(int stairs, int maxJump) {
 		ArgumentOutOfRangeException.ThrowIfNegative(stairs);
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxJump);

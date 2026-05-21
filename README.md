@@ -61,6 +61,7 @@ dotnet test six-demon-bag.sln
 ## Usage examples
 
 ```csharp
+using System.Linq;
 using Six.Demon.Bag.Calc;
 using Six.Demon.Bag.Primes;
 using Six.Demon.Bag.Rationals;

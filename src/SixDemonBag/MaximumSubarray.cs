@@ -10,7 +10,9 @@ public static class MaximumSubarray {
 		var current = values[0];
 
 		for(var i = 1; i < values.Count; i++) {
-			current = Math.Max(values[i], checked(current + values[i]));
+			current = current > 0
+				? checked(current + values[i])
+				: values[i];
 			best = Math.Max(best, current);
 		}
 

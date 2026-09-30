@@ -1,37 +1,39 @@
-# six-demon-bag
+# Six Demon Bag
 
-`six-demon-bag` is a collection of .NET 8 algorithm and numeric exercises organized as projects in a single solution.
+Short, idiomatic C# solutions to common interview problems.
 
-## Requirements
+## Challenges
 
-- .NET SDK 8.0+
+| Area | Solutions |
+|---|---|
+| Search and sorting | Binary search, bubble sort, quicksort, heap sort |
+| Combinatorics | Factorial, binomial coefficient, permutations, combinations |
+| Sequences | Prime, Fibonacci, Bernoulli, stair-walk counts |
+| Optimization | Stock profit, maximum subarray |
+| Parsing | Roman numerals, shortest palindrome |
+| Modeling | Bowling score |
+| Arithmetic | Arbitrary-precision, 32-bit, and 64-bit rational numbers |
 
-## Repository layout
-
-The solution file (`six-demon-bag.sln`) contains top-level projects, including:
-
-- `BigMath` and `BigRationals` for large-number and rational-number helpers
-- `Primes`, `BernoulliNumbers`, and `StairWalk` for numeric sequences
-- `Sorting`, `BinarySearch`, and `Permutations` for classic algorithms
-- `RomanNumerals`, `Palindromes`, `GetMaxProfit`, `BowlingScore`, and `SubsetMaxSum` for kata-style problems
-- `SixDemonBag.Rationals` for additional rational number types
+Implementations are in `src\SixDemonBag`; matching xUnit tests are in
+`tests\SixDemonBag.Tests`. Invalid inputs are rejected with standard .NET
+exceptions.
 
 ## Build and test
 
-```bash
-dotnet build six-demon-bag.sln
-dotnet test six-demon-bag.sln
+Requires the .NET 10 SDK.
+
+```powershell
+dotnet build .\six-demon-bag.sln --configuration Release
+dotnet test .\six-demon-bag.sln --configuration Release
 ```
 
-## Usage examples
+## Examples
 
 ```csharp
-using BigMath;
-using Primes;
-using RomanNumerals;
+using SixDemonBag;
 
-var factorial = BigMaths.Factorial(10);
-var binomial = BigMaths.BinomialCoefficient(52, 5);
-var firstTenPrimes = PrimeNumbers.Sequence.Take(10).ToArray();
-var romanValue = RomanNumeralConverter.ToInteger("CMXCVIII");
+var index = BinarySearch.Iterative(new[] { 1, 3, 5, 7 }, 5);
+var profit = MaxProfit.Calculate([10, 22, 5, 75, 65, 80], 2);
+var roman = RomanNumerals.Format(998);
+var primes = Primes.Sequence.Take(10);
 ```

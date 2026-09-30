@@ -32,6 +32,14 @@ public class OptimizationTests {
 		Assert.Equal(expected, MaximumSubarray.Sum(values));
 
 	[Fact]
+	public void MaximumSubarrayDoesNotOverflowForDiscardedCandidate() =>
+		Assert.Equal(int.MaxValue, MaximumSubarray.Sum([int.MaxValue, int.MinValue]));
+
+	[Fact]
+	public void MaximumSubarrayOverflowIsReported() =>
+		Assert.Throws<OverflowException>(() => MaximumSubarray.Sum([int.MaxValue, 1]));
+
+	[Fact]
 	public void EmptyMaximumSubarrayIsRejected() =>
 		Assert.Throws<ArgumentException>(() => MaximumSubarray.Sum([]));
 }

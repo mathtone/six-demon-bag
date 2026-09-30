@@ -16,6 +16,20 @@ public class CombinatorialTests {
 		Assert.Equal([string.Empty], Permutations.Of(string.Empty));
 
 	[Fact]
+	public void PermutationEnumeratorsUseIndependentWorkingCopies() {
+		var permutations = Permutations.Of(new[] { 1, 2, 3 });
+		using var first = permutations.GetEnumerator();
+
+		Assert.True(first.MoveNext());
+		Assert.Equal(new[] { 1, 2, 3 }, first.Current);
+		Assert.True(first.MoveNext());
+		Assert.Equal(new[] { 1, 3, 2 }, first.Current);
+		Assert.Equal(6, permutations.Count());
+		Assert.True(first.MoveNext());
+		Assert.Equal(new[] { 2, 1, 3 }, first.Current);
+	}
+
+	[Fact]
 	public void SubsetsAreGenerated() =>
 		Assert.Equal(1326, Permutations.Subsets(Enumerable.Range(0, 52), 2).Count());
 

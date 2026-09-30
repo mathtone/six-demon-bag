@@ -6,16 +6,14 @@ public static class MaximumSubarray {
 		if(values.Count == 0)
 			throw new ArgumentException("At least one value is required.", nameof(values));
 
-		var best = values[0];
-		var current = values[0];
+		long best = values[0];
+		long current = values[0];
 
 		for(var i = 1; i < values.Count; i++) {
-			current = current > 0
-				? checked(current + values[i])
-				: values[i];
+			current = Math.Max(values[i], current + values[i]);
 			best = Math.Max(best, current);
 		}
 
-		return best;
+		return checked((int)best);
 	}
 }

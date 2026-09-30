@@ -8,20 +8,26 @@ public static class Permutations {
 
 	public static IEnumerable<T[]> Of<T>(IEnumerable<T> values) {
 		ArgumentNullException.ThrowIfNull(values);
-		var items = values.ToArray();
-		return Generate(0);
+		var source = values.ToArray();
+		return Enumerate();
 
-		IEnumerable<T[]> Generate(int start) {
-			if(start == items.Length) {
-				yield return [.. items];
-				yield break;
-			}
+		IEnumerable<T[]> Enumerate() {
+			var items = (T[])source.Clone();
+			foreach(var permutation in Generate(0))
+				yield return permutation;
 
-			for(var i = start; i < items.Length; i++) {
-				(items[start], items[i]) = (items[i], items[start]);
-				foreach(var permutation in Generate(start + 1))
-					yield return permutation;
-				(items[start], items[i]) = (items[i], items[start]);
+			IEnumerable<T[]> Generate(int start) {
+				if(start == items.Length) {
+					yield return [.. items];
+					yield break;
+				}
+
+				for(var i = start; i < items.Length; i++) {
+					(items[start], items[i]) = (items[i], items[start]);
+					foreach(var permutation in Generate(start + 1))
+						yield return permutation;
+					(items[start], items[i]) = (items[i], items[start]);
+				}
 			}
 		}
 	}
